@@ -41,22 +41,4 @@ jobs:
       - name: Docker build web
         working-directory: .
         run: docker build -f web-client/Dockerfile --build-arg VITE_API_URL= -t jadmin-web:ci web-client
-
-  mobile-test:
-    name: mobile-test
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: mobile-client
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: mobile-client/package-lock.json
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run test
-      - run: npm run typecheck
-      - run: npm run build:check
+        

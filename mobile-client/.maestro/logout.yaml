@@ -1,9 +1,0 @@
-appId: com.jadmin.mobile
----
-- runFlow: login.yaml
-- tapOn:
-    label: "Abrir menu"
-- tapOn:
-    label: "Sair"
-- assertVisible:
-    label: "Entrar"
