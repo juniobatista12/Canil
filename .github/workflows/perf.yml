@@ -1,0 +1,140 @@
+name: Performance
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: perf-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  verify-unit-and-web-e2e:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      head_sha: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const headSha = context.payload.pull_request.head.sha
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const workflows = [
+              { file: 'unit.yml', label: 'Unit' },
+              { file: 'e2e-web.yml', label: 'E2E Web' },
+            ]
+
+            async function getRun(file) {
+              const { data } = await github.rest.actions.listWorkflowRuns({
+                owner,
+                repo,
+                workflow_id: file,
+                head_sha: headSha,
+                per_page: 10,
+              })
+              return data.workflow_runs.find((r) => r.head_sha === headSha)
+            }
+
+            const deadline = Date.now() + 90 * 60 * 1000
+            while (Date.now() < deadline) {
+              let allSuccess = true
+              for (const { file, label } of workflows) {
+                const run = await getRun(file)
+                const conclusion = run?.conclusion
+                const status = run?.status
+                core.info(`${label} (${file}): ${conclusion ?? status ?? 'not found'}`)
+                if (conclusion === 'failure' || conclusion === 'cancelled') {
+                  core.setFailed(`${label} finished with ${conclusion}`)
+                  core.setOutput('should_run', 'false')
+                  return
+                }
+                if (conclusion !== 'success') {
+                  allSuccess = false
+                }
+              }
+              if (allSuccess) {
+                core.setOutput('should_run', 'true')
+                return
+              }
+              await new Promise((r) => setTimeout(r, 30000))
+            }
+            core.setFailed('Timeout waiting for Unit and E2E Web')
+            core.setOutput('should_run', 'false')
+
+  perf-load:
+    name: perf-load
+    needs: verify-unit-and-web-e2e
+    if: |
+      always() && (
+        github.event_name == 'workflow_dispatch' ||
+        (needs.verify-unit-and-web-e2e.result == 'success' && needs.verify-unit-and-web-e2e.outputs.should_run == 'true')
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.sha || needs.verify-unit-and-web-e2e.outputs.head_sha }}
+      - name: Start stack
+        run: docker compose --env-file .env.test up -d --build db redis api web
+      - name: Wait for health
+        run: |
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:8080/health && curl -sf http://localhost/ && exit 0
+            sleep 5
+          done
+          exit 1
+      - name: Install k6
+        uses: grafana/setup-k6-action@v1
+      - name: Run k6 web sessions
+        env:
+          K6_WEB_BASE_URL: http://localhost
+          SEED_TENANT_SLUG: system
+          SEED_SUPERADMIN_EMAIL: superadmin@localhost
+          SEED_SUPERADMIN_PASSWORD: SuperAdmin@123!
+        run: |
+          mkdir -p results
+          k6 run JAdmin/Tests/load/k6/web/session-mixed.js --out json=results/k6-web.json &
+          echo $! > results/k6.pid
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web-client/package-lock.json
+      - name: Playwright smoke under load
+        working-directory: web-client
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost
+          E2E_SUPERADMIN_EMAIL: superadmin@localhost
+          E2E_SUPERADMIN_PASSWORD: SuperAdmin@123!
+          SEED_TENANT_SLUG: system
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run perf:under-load
+          if [ -f ../results/k6.pid ]; then kill $(cat ../results/k6.pid) || true; fi
+      - name: Lighthouse CI
+        working-directory: web-client
+        run: npm run perf:lighthouse
+        continue-on-error: true
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-results
+          path: |
+            results
+            web-client/playwright-load-report
+            web-client/lighthouse-results
+          if-no-files-found: ignore
+      - name: Tear down
+        if: always()
+        run: docker compose --env-file .env.test down -v

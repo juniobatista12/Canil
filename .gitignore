@@ -1,0 +1,17 @@
+.env
+*.user
+.vs/
+bin/
+obj/
+web-client/node_modules/
+web-client/dist/
+web-client/.env
+mobile-client/node_modules/
+mobile-client/.expo/
+mobile-client/.expo-export-ci/
+mobile-client/dist/
+mobile-client/.env
+# Test coverage (local/CI only — not committed)
+web-client/coverage/
+mobile-client/coverage/
+**/TestResults/

@@ -1,0 +1,19 @@
+appId: com.jadmin.mobile
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    label: "E-mail"
+- tapOn:
+    label: "E-mail"
+- inputText: ${SEED_SUPERADMIN_EMAIL}
+- tapOn:
+    label: "Senha"
+- inputText: ${SEED_SUPERADMIN_PASSWORD}
+- hideKeyboard
+- tapOn:
+    label: "Entrar"
+- extendedWaitUntil:
+    visible:
+      label: "Abrir menu"
+    timeout: 60000

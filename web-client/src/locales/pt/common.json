@@ -1,0 +1,100 @@
+{
+  "app": {
+    "name": "JAdmin",
+    "loading": "Carregando..."
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "users": "Usuários",
+    "registerUser": "Registrar usuário",
+    "tenants": "Tenants",
+    "profile": "Perfil",
+    "logout": "Sair",
+    "themeLight": "Modo claro",
+    "themeDark": "Modo escuro"
+  },
+  "auth": {
+    "login": "Entrar",
+    "tenantSlug": "Tenant (slug)",
+    "email": "E-mail",
+    "password": "Senha",
+    "twoFactorCode": "Código 2FA",
+    "loginTitle": "Acesso ao painel",
+    "loginSubtitle": "Informe suas credenciais para continuar"
+  },
+  "dashboard": {
+    "title": "Painel",
+    "welcome": "Bem-vindo, {{email}}",
+    "tenant": "Tenant",
+    "roles": "Roles",
+    "twoFactor": "2FA",
+    "enabled": "Ativo",
+    "disabled": "Inativo",
+    "quickLinks": "Acesso rápido"
+  },
+  "users": {
+    "title": "Usuários",
+    "detail": "Detalhe do usuário",
+    "register": "Registrar usuário",
+    "email": "E-mail",
+    "tenant": "Tenant",
+    "roles": "Roles",
+    "twoFactor": "2FA",
+    "filterTenant": "Filtrar por tenant",
+    "allTenants": "Todos os tenants",
+    "viewDetails": "Ver detalhes",
+    "addRole": "Adicionar role",
+    "removeRole": "Remover role",
+    "moveToSystem": "Mover para tenant sistema",
+    "selectRole": "Selecione a role",
+    "notFound": "Usuário não encontrado",
+    "registerSuccess": "Usuário registrado com sucesso"
+  },
+  "tenants": {
+    "title": "Tenants",
+    "create": "Novo tenant",
+    "edit": "Editar tenant",
+    "name": "Nome",
+    "slug": "Slug",
+    "status": "Status",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "system": "Sistema",
+    "createSuccess": "Tenant criado com sucesso",
+    "updateSuccess": "Tenant atualizado com sucesso",
+    "deactivate": "Desativar tenant",
+    "deactivateConfirm": "Deseja desativar o tenant {{name}}?",
+    "deactivateSuccess": "Tenant desativado"
+  },
+  "profile": {
+    "title": "Perfil",
+    "twoFactorTitle": "Autenticação em dois fatores",
+    "setup": "Configurar 2FA",
+    "enable": "Ativar 2FA",
+    "disable": "Desativar 2FA",
+    "manualKey": "Chave manual",
+    "qrCodeAlt": "QR Code 2FA",
+    "enableWarning": "Ao ativar o 2FA, todas as outras sessões serão encerradas. Deseja continuar?",
+    "disableWarning": "Ao desativar o 2FA, todas as outras sessões serão encerradas. Informe sua senha e o código atual.",
+    "enableSuccess": "2FA ativado com sucesso",
+    "disableSuccess": "2FA desativado com sucesso"
+  },
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "actions": "Ações",
+    "previous": "Anterior",
+    "next": "Próxima",
+    "page": "Página {{page}} de {{total}}",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "errors": {
+    "generic": "Ocorreu um erro inesperado",
+    "sessionExpired": "Sua sessão expirou. Faça login novamente.",
+    "accessDenied": "Acesso negado",
+    "validation": "Verifique os campos do formulário"
+  }
+}

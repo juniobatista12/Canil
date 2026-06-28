@@ -1,0 +1,19 @@
+appId: com.jadmin.mobile
+---
+- runFlow: login.yaml
+- tapOn:
+    label: "Abrir menu"
+- tapOn:
+    label: "Usuários"
+- extendedWaitUntil:
+    visible:
+      label: "Registrar usuário"
+    timeout: 30000
+- tapOn:
+    label: "Abrir menu"
+- tapOn:
+    label: "Tenants"
+- extendedWaitUntil:
+    visible:
+      label: "Novo tenant"
+    timeout: 30000

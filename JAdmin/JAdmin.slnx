@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="JAdmin.csproj" />
+  <Project Path="Tests/JAdmin.UnitTests/JAdmin.UnitTests.csproj" />
+  <Project Path="Tests/JAdmin.IntegrationTests/JAdmin.IntegrationTests.csproj" />
+</Solution>
