@@ -13,14 +13,13 @@ public class TokenService(IOptions<JwtSettings> jwtOptions) : ITokenService
 {
     private readonly JwtSettings _settings = jwtOptions.Value;
 
-    public (string Token, DateTime ExpiresAt) GenerateAccessToken(ApplicationUser user, IReadOnlyList<string> roles, Guid tenantId)
+    public (string Token, DateTime ExpiresAt) GenerateAccessToken(ApplicationUser user, IReadOnlyList<string> roles)
     {
         var expiresAt = DateTime.UtcNow.AddMinutes(_settings.ExpirationMinutes);
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id),
-            new(ClaimTypes.Email, user.Email ?? string.Empty),
-            new("tenant_id", tenantId.ToString())
+            new(ClaimTypes.Email, user.Email ?? string.Empty)
         };
 
         claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));

@@ -1,8 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 
 const roleVariants: Record<string, 'default' | 'secondary' | 'outline'> = {
-  SuperAdmin: 'default',
-  Admin: 'secondary',
+  Admin: 'default',
   User: 'outline',
 }
 

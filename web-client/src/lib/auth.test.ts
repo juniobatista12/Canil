@@ -4,7 +4,7 @@ import { publishAuthLogout, sanitizeRedirect, subscribeAuthLogout } from '@/lib/
 describe('sanitizeRedirect', () => {
   it('accepts internal paths', () => {
     expect(sanitizeRedirect('/users')).toBe('/users')
-    expect(sanitizeRedirect('/tenants/abc')).toBe('/tenants/abc')
+    expect(sanitizeRedirect('/users/abc')).toBe('/users/abc')
   })
 
   it('rejects external urls and login', () => {

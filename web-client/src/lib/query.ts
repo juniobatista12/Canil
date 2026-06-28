@@ -3,17 +3,12 @@ import type { UserInfoDto } from '@/types/auth'
 import type { UserListItemDto } from '@/types/users'
 import type { PagedResult } from '@/types/api'
 
-type UserListItemSource = Pick<
-  UserInfoDto,
-  'id' | 'email' | 'tenantId' | 'tenantName' | 'roles' | 'twoFactorEnabled'
->
+type UserListItemSource = Pick<UserInfoDto, 'id' | 'email' | 'roles' | 'twoFactorEnabled'>
 
 export function toUserListItem(user: UserListItemSource): UserListItemDto {
   return {
     id: user.id,
     email: user.email,
-    tenantId: user.tenantId,
-    tenantName: user.tenantName ?? '',
     roles: user.roles ?? [],
     twoFactorEnabled: user.twoFactorEnabled ?? false,
   }
@@ -67,18 +62,10 @@ export function findUserInCache(queryClient: QueryClient, id: string): UserListI
   return null
 }
 
-export function usersQueryKey(filters: { page: number; pageSize: number; tenantId?: string }) {
+export function usersQueryKey(filters: { page: number; pageSize: number }) {
   return ['users', filters] as const
-}
-
-export function tenantsQueryKey(filters: { page: number; pageSize: number }) {
-  return ['tenants', filters] as const
 }
 
 export function userRolesQueryKey(userId: string) {
   return ['users', userId, 'roles'] as const
-}
-
-export function tenantDetailQueryKey(tenantId: string) {
-  return ['tenants', tenantId] as const
 }

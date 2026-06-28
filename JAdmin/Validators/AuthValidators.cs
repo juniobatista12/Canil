@@ -1,9 +1,6 @@
 using FluentValidation;
 using JAdmin.Common;
-using JAdmin.Config;
 using JAdmin.Dtos.Auth;
-using JAdmin.Dtos.Tenants;
-using Microsoft.Extensions.Options;
 
 namespace JAdmin.Validators;
 
@@ -13,7 +10,6 @@ public class LoginRequestValidator : AbstractValidator<LoginRequest>
     {
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
         RuleFor(x => x.Password).NotEmpty();
-        RuleFor(x => x.TenantSlug).NotEmpty();
     }
 }
 
@@ -29,31 +25,6 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
             .Matches(@"[^a-zA-Z0-9]").WithMessage("Password must contain at least one special character.");
         RuleForEach(x => x.Roles).Must(r => Roles.All.Contains(r))
             .When(x => x.Roles.Count > 0);
-    }
-}
-
-public class CreateTenantRequestValidator : AbstractValidator<CreateTenantRequest>
-{
-    public CreateTenantRequestValidator(IOptions<SeedSettings> seedOptions)
-    {
-        var systemSlug = seedOptions.Value.TenantSlug;
-
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
-        RuleFor(x => x.Slug)
-            .NotEmpty()
-            .MaximumLength(50)
-            .Matches(@"^[a-z0-9-]{2,50}$")
-            .WithMessage("Slug must be lowercase alphanumeric with hyphens, 2-50 characters.")
-            .Must(slug => !string.Equals(slug, systemSlug, StringComparison.OrdinalIgnoreCase))
-            .WithMessage("Slug is reserved for the system tenant.");
-    }
-}
-
-public class UpdateTenantRequestValidator : AbstractValidator<UpdateTenantRequest>
-{
-    public UpdateTenantRequestValidator()
-    {
-        RuleFor(x => x.Name).MaximumLength(200).When(x => x.Name is not null);
     }
 }
 

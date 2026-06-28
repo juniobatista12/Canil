@@ -1,11 +1,11 @@
 import http from 'k6/http';
 import { check } from 'k6';
-import { webBaseUrl, tenantSlug, email, password } from './config.js';
+import { webBaseUrl, email, password } from './config.js';
 
 export function loginWeb(jar) {
   const res = http.post(
     `${webBaseUrl}/api/auth/login`,
-    JSON.stringify({ email, password, tenantSlug }),
+    JSON.stringify({ email, password }),
     {
       jar,
       headers: { 'Content-Type': 'application/json' },

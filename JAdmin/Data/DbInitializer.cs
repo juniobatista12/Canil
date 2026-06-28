@@ -22,22 +22,6 @@ public class DbInitializer(
         if (!seed.Enabled)
             return;
 
-        var tenant = await db.Tenants.FirstOrDefaultAsync(t => t.Slug == seed.TenantSlug, cancellationToken);
-        if (tenant is null)
-        {
-            tenant = new Tenant
-            {
-                Id = Guid.NewGuid(),
-                Name = seed.TenantName,
-                Slug = seed.TenantSlug,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
-            db.Tenants.Add(tenant);
-            await db.SaveChangesAsync(cancellationToken);
-            logger.LogInformation("Created system tenant {Slug}", seed.TenantSlug);
-        }
-
         foreach (var role in seed.Roles)
         {
             if (!await roleManager.RoleExistsAsync(role))
@@ -45,23 +29,20 @@ public class DbInitializer(
         }
 
         await EnsureUserAsync(
-            tenant,
-            seed.SuperAdminEmail,
-            seed.SuperAdminPassword,
-            seed.SuperAdminRoles,
+            seed.AdminEmail,
+            seed.AdminPassword,
+            seed.AdminRoles,
             cancellationToken);
     }
 
     private async Task EnsureUserAsync(
-        Tenant tenant,
         string email,
         string password,
         IEnumerable<string> roles,
         CancellationToken cancellationToken)
     {
         var user = await userManager.Users
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(u => u.TenantId == tenant.Id && u.Email == email, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 
         if (user is not null)
             return;
@@ -70,8 +51,7 @@ public class DbInitializer(
         {
             UserName = email,
             Email = email,
-            EmailConfirmed = true,
-            TenantId = tenant.Id
+            EmailConfirmed = true
         };
 
         var result = await userManager.CreateAsync(user, password);

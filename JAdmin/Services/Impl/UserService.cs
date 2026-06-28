@@ -1,5 +1,4 @@
 using JAdmin.Common;
-using JAdmin.Data;
 using JAdmin.Dtos.Common;
 using JAdmin.Dtos.Users;
 using JAdmin.Entities;
@@ -9,21 +8,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JAdmin.Services.Impl;
 
-public class UserService(
-    UserManager<ApplicationUser> userManager,
-    ITenantContext tenantContext) : IUserService
+public class UserService(UserManager<ApplicationUser> userManager) : IUserService
 {
     public async Task<PagedResult<UserListItemDto>> GetAllAsync(PaginationQuery query, CancellationToken cancellationToken = default)
     {
         var page = Math.Max(1, query.Page);
         var pageSize = Math.Clamp(query.PageSize, 1, 100);
 
-        var usersQuery = userManager.Users
-            .Include(u => u.Tenant)
-            .AsQueryable();
-
-        if (tenantContext.IsSuperAdmin && query.TenantId.HasValue)
-            usersQuery = usersQuery.Where(u => u.TenantId == query.TenantId);
+        var usersQuery = userManager.Users.AsQueryable();
 
         var total = await usersQuery.CountAsync(cancellationToken);
         var users = await usersQuery
@@ -40,8 +32,6 @@ public class UserService(
             {
                 Id = user.Id,
                 Email = user.Email ?? string.Empty,
-                TenantId = user.TenantId,
-                TenantName = user.Tenant.Name,
                 Roles = roles.ToList(),
                 TwoFactorEnabled = await userManager.GetTwoFactorEnabledAsync(user)
             });

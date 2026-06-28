@@ -30,7 +30,7 @@ public class AuthController(
     }
 
     [HttpPost("register")]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.SuperAdmin}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
         var result = await authService.RegisterAsync(request, cancellationToken);

@@ -5,5 +5,5 @@ namespace JAdmin.Services.Interfaces;
 
 public interface ITokenService
 {
-    (string Token, DateTime ExpiresAt) GenerateAccessToken(ApplicationUser user, IReadOnlyList<string> roles, Guid tenantId);
+    (string Token, DateTime ExpiresAt) GenerateAccessToken(ApplicationUser user, IReadOnlyList<string> roles);
 }

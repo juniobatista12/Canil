@@ -1,23 +1,23 @@
 import { test, expect } from '@playwright/test'
 import { authenticator } from 'otplib'
-import { disableTwoFactorOnProfile, loginAsSuperAdmin } from './helpers/auth'
+import { disableTwoFactorOnProfile, loginAsAdmin } from './helpers/auth'
 import { goToProfile } from './helpers/navigation'
-import { resetSuperAdminTwoFactor } from './helpers/reset-2fa'
+import { resetAdminTwoFactor } from './helpers/reset-2fa'
 
 test.describe('profile 2FA', () => {
   test.describe.configure({ timeout: 60_000 })
 
   test.beforeEach(() => {
-    resetSuperAdminTwoFactor()
+    resetAdminTwoFactor()
   })
 
   test.afterEach(async ({ page }) => {
-    resetSuperAdminTwoFactor()
+    resetAdminTwoFactor()
     await page.context().clearCookies()
   })
 
   test('setup and enable 2FA using TOTP from setup response', async ({ page }) => {
-    await loginAsSuperAdmin(page)
+    await loginAsAdmin(page)
     await goToProfile(page)
 
     await page.getByRole('button', { name: /configurar 2fa/i }).click()

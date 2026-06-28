@@ -37,13 +37,13 @@ describe('AuthContext', () => {
   })
 
   it('boots authenticated when getMe succeeds', async () => {
-    authMocks.getMe.mockResolvedValue(mockUserInfo({ roles: ['SuperAdmin'] }))
+    authMocks.getMe.mockResolvedValue(mockUserInfo({ roles: ['Admin'] }))
 
     renderWithProviders(<Probe />, { withAuth: true })
 
     await waitFor(() => {
       expect(screen.getByTestId('status')).toHaveTextContent(/^authenticated$/)
-      expect(screen.getByTestId('email')).toHaveTextContent('superadmin@localhost')
+      expect(screen.getByTestId('email')).toHaveTextContent('admin@localhost')
     })
   })
 

@@ -20,8 +20,7 @@ import { ROLES } from '@/types/auth'
 
 const navItems = [
   { to: '/', labelKey: 'nav.dashboard', roles: [] as string[] },
-  { to: '/users', labelKey: 'nav.users', roles: [ROLES.Admin, ROLES.SuperAdmin] },
-  { to: '/tenants', labelKey: 'nav.tenants', roles: [ROLES.SuperAdmin] },
+  { to: '/users', labelKey: 'nav.users', roles: [ROLES.Admin] },
 ]
 
 export function AppLayout() {

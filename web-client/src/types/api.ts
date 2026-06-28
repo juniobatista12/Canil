@@ -22,5 +22,4 @@ export interface PagedResult<T> {
 export interface PaginationQuery {
   page?: number
   pageSize?: number
-  tenantId?: string
 }

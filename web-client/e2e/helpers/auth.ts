@@ -1,16 +1,14 @@
 import { expect, type Page } from '@playwright/test'
 import { authenticator } from 'otplib'
 
-export const e2eEmail = process.env.E2E_SUPERADMIN_EMAIL ?? 'superadmin@localhost'
-export const e2ePassword = process.env.E2E_SUPERADMIN_PASSWORD ?? 'SuperAdmin@123!'
-export const e2eTenantSlug = process.env.SEED_TENANT_SLUG ?? 'system'
+export const e2eEmail = process.env.E2E_ADMIN_EMAIL ?? 'admin@localhost'
+export const e2ePassword = process.env.E2E_ADMIN_PASSWORD ?? 'Admin@123!'
 
-export async function loginAsSuperAdmin(
+export async function loginAsAdmin(
   page: Page,
   options?: { totpSecret?: string },
 ): Promise<void> {
   await page.goto('/login')
-  await page.getByLabel(/tenant/i).fill(e2eTenantSlug)
   await page.getByLabel('E-mail').fill(e2eEmail)
   await page.getByLabel('Senha').fill(e2ePassword)
   await page.getByRole('button', { name: 'Entrar' }).click()

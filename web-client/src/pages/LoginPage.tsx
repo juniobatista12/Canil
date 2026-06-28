@@ -24,7 +24,6 @@ export function LoginPage() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      tenantSlug: 'system',
       email: '',
       password: '',
       twoFactorCode: '',
@@ -46,7 +45,6 @@ export function LoginPage() {
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       const response = await login({
-        tenantSlug: values.tenantSlug,
         email: values.email,
         password: values.password,
         twoFactorCode: values.twoFactorCode || undefined,
@@ -84,13 +82,6 @@ export function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="tenantSlug">{t('auth.tenantSlug')}</Label>
-              <Input id="tenantSlug" {...form.register('tenantSlug')} />
-              {form.formState.errors.tenantSlug && (
-                <p className="text-sm text-destructive">{form.formState.errors.tenantSlug.message}</p>
-              )}
-            </div>
             <div className="space-y-2">
               <Label htmlFor="email">{t('auth.email')}</Label>
               <Input id="email" type="email" autoComplete="username" {...form.register('email')} />

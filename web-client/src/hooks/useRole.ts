@@ -15,7 +15,6 @@ export function useRole() {
     user,
     hasRole,
     hasAnyRole,
-    isSuperAdmin: hasRole('SuperAdmin'),
     isAdmin: hasRole('Admin'),
   }
 }

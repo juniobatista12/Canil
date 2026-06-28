@@ -9,7 +9,7 @@ namespace JAdmin.Controllers;
 
 [ApiController]
 [Route("api/users")]
-[Authorize(Roles = $"{Roles.Admin},{Roles.SuperAdmin}")]
+[Authorize(Roles = Roles.Admin)]
 public class UsersController(IUserService userService, IUserRoleService userRoleService) : ControllerBase
 {
     [HttpGet]
@@ -37,14 +37,6 @@ public class UsersController(IUserService userService, IUserRoleService userRole
     public async Task<IActionResult> RemoveRole(string id, string roleName, CancellationToken cancellationToken)
     {
         var result = await userRoleService.RemoveRoleAsync(id, roleName, cancellationToken);
-        return result.ToActionResult(this);
-    }
-
-    [HttpPost("{id}/move-to-system-tenant")]
-    [Authorize(Roles = Roles.SuperAdmin)]
-    public async Task<IActionResult> MoveToSystemTenant(string id, CancellationToken cancellationToken)
-    {
-        var result = await userRoleService.MoveToSystemTenantAsync(id, cancellationToken);
         return result.ToActionResult(this);
     }
 }

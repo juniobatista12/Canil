@@ -35,13 +35,13 @@ describe('LoginPage', () => {
       refreshToken: 'r',
       expiresAt: new Date().toISOString(),
       refreshExpiresAt: new Date().toISOString(),
-      user: mockUserInfo({ roles: ['SuperAdmin'] }),
+      user: mockUserInfo({ roles: ['Admin'] }),
     })
 
     renderWithProviders(<LoginPage />, { route: '/login' })
 
-    await user.type(screen.getByLabelText(/e-mail/i), 'superadmin@localhost')
-    await user.type(screen.getByLabelText(/^senha$/i), 'SuperAdmin@123!')
+    await user.type(screen.getByLabelText(/e-mail/i), 'admin@localhost')
+    await user.type(screen.getByLabelText(/^senha$/i), 'Admin@123!')
     await user.click(screen.getByRole('button', { name: /entrar/i }))
 
     await waitFor(() => {
@@ -59,13 +59,13 @@ describe('LoginPage', () => {
         refreshToken: 'r',
         expiresAt: new Date().toISOString(),
         refreshExpiresAt: new Date().toISOString(),
-        user: mockUserInfo({ roles: ['SuperAdmin'] }),
+        user: mockUserInfo({ roles: ['Admin'] }),
       })
 
     renderWithProviders(<LoginPage />, { route: '/login' })
 
-    await user.type(screen.getByLabelText(/e-mail/i), 'superadmin@localhost')
-    await user.type(screen.getByLabelText(/^senha$/i), 'SuperAdmin@123!')
+    await user.type(screen.getByLabelText(/e-mail/i), 'admin@localhost')
+    await user.type(screen.getByLabelText(/^senha$/i), 'Admin@123!')
     await user.click(screen.getByRole('button', { name: /entrar/i }))
 
     await waitFor(() => {

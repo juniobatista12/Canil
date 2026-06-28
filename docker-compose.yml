@@ -50,13 +50,11 @@ services:
       Jwt__RefreshExpirationDays: ${JWT_REFRESH_EXPIRATION_DAYS:-7}
       TwoFactor__Issuer: ${TWO_FACTOR_ISSUER:-JAdmin}
       Cors__AllowedOrigins: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000,http://localhost}
-      Seed__Enabled: ${SEED_ENABLED:-false}
-      Seed__TenantName: ${SEED_TENANT_NAME:-System}
-      Seed__TenantSlug: ${SEED_TENANT_SLUG:-system}
-      Seed__SuperAdminEmail: ${SEED_SUPERADMIN_EMAIL:-superadmin@localhost}
-      Seed__SuperAdminPassword: ${SEED_SUPERADMIN_PASSWORD:-SuperAdmin@123!}
-      Seed__Roles: ${SEED_ROLES:-Admin,User,SuperAdmin}
-      Seed__SuperAdminRoles: ${SEED_SUPERADMIN_ROLES:-SuperAdmin}
+      Seed__Enabled: ${SEED_ENABLED:-true}
+      Seed__AdminEmail: ${SEED_ADMIN_EMAIL:-admin@localhost}
+      Seed__AdminPassword: ${SEED_ADMIN_PASSWORD:-Admin@123!}
+      Seed__Roles: ${SEED_ROLES:-Admin,User}
+      Seed__AdminRoles: ${SEED_ADMIN_ROLES:-Admin}
     depends_on:
       db:
         condition: service_healthy

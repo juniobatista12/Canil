@@ -3,16 +3,16 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
-const superAdminEmail = process.env.E2E_SUPERADMIN_EMAIL ?? 'superadmin@localhost'
+const adminEmail = process.env.E2E_ADMIN_EMAIL ?? 'admin@localhost'
 
-export function resetSuperAdminTwoFactor(): void {
+export function resetAdminTwoFactor(): void {
   if (!process.env.CI) return
 
   const sql = `
-UPDATE "AspNetUsers" SET "TwoFactorEnabled" = false WHERE "Email" = '${superAdminEmail}';
+UPDATE "AspNetUsers" SET "TwoFactorEnabled" = false WHERE "Email" = '${adminEmail}';
 DELETE FROM "AspNetUserTokens"
 WHERE "LoginProvider" = 'Authenticator'
-  AND "UserId" IN (SELECT "Id" FROM "AspNetUsers" WHERE "Email" = '${superAdminEmail}');
+  AND "UserId" IN (SELECT "Id" FROM "AspNetUsers" WHERE "Email" = '${adminEmail}');
 `.trim()
 
   try {

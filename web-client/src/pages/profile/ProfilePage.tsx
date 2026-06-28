@@ -82,9 +82,6 @@ export function ProfilePage() {
           <CardTitle>{current.email}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          <p>
-            <span className="font-medium">{t('dashboard.tenant')}:</span> {current.tenantName}
-          </p>
           <div className="flex items-center gap-2">
             <span className="font-medium">{t('dashboard.roles')}:</span>
             <RoleBadges roles={current.roles} />

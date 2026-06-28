@@ -19,7 +19,6 @@ describe('RoleRoute', () => {
       user: null,
       hasRole: vi.fn(),
       hasAnyRole: () => true,
-      isSuperAdmin: false,
       isAdmin: true,
     })
 
@@ -37,12 +36,11 @@ describe('RoleRoute', () => {
       user: null,
       hasRole: vi.fn(),
       hasAnyRole: () => false,
-      isSuperAdmin: false,
       isAdmin: false,
     })
 
     renderWithProviders(
-      <RoleRoute roles={['SuperAdmin']}>
+      <RoleRoute roles={['Admin']}>
         <div>restricted</div>
       </RoleRoute>,
     )

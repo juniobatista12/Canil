@@ -36,14 +36,13 @@ public class RefreshTokenService(
 
     public async Task<(string PlainToken, DateTime ExpiresAt)> CreateAsync(
         string userId,
-        Guid tenantId,
         CancellationToken cancellationToken = default)
     {
         var plainToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         var expiresAt = DateTime.UtcNow.AddDays(_settings.RefreshExpirationDays);
         var ttl = TimeSpan.FromDays(_settings.RefreshExpirationDays);
         var hash = HashToken(plainToken);
-        var payload = JsonSerializer.Serialize(new RefreshPayload(userId, tenantId));
+        var payload = JsonSerializer.Serialize(new RefreshPayload(userId));
 
         await _db.StringSetAsync(RefreshKeyPrefix + hash, payload, ttl);
         await _db.SetAddAsync(UserIndexPrefix + userId, hash);
@@ -80,7 +79,7 @@ public class RefreshTokenService(
         if (authResponse is null)
             return ServiceResult<AuthResponse>.Fail("Invalid refresh token", StatusCodes.Status401Unauthorized);
 
-        var (newPlain, newExpires) = await CreateAsync(payload.UserId, authResponse.User.TenantId, cancellationToken);
+        var (newPlain, newExpires) = await CreateAsync(payload.UserId, cancellationToken);
         authResponse.RefreshToken = newPlain;
         authResponse.RefreshExpiresAt = newExpires;
 
@@ -119,5 +118,5 @@ public class RefreshTokenService(
         await _db.KeyDeleteAsync(indexKey);
     }
 
-    private sealed record RefreshPayload(string UserId, Guid TenantId);
+    private sealed record RefreshPayload(string UserId);
 }

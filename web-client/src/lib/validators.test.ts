@@ -4,8 +4,6 @@ import {
   loginSchema,
   passwordSchema,
   registerSchema,
-  tenantCreateSchema,
-  tenantUpdateSchema,
   totpCodeSchema,
 } from '@/lib/validators'
 
@@ -13,7 +11,6 @@ describe('validators', () => {
   it('validates login schema', () => {
     expect(
       loginSchema.safeParse({
-        tenantSlug: 'system',
         email: 'user@test.com',
         password: 'secret',
       }).success,
@@ -40,11 +37,6 @@ describe('validators', () => {
     }).success).toBe(true)
   })
 
-  it('validates tenant slug', () => {
-    expect(tenantCreateSchema.safeParse({ name: 'Acme', slug: 'acme-corp' }).success).toBe(true)
-    expect(tenantCreateSchema.safeParse({ name: 'Acme', slug: 'INVALID' }).success).toBe(false)
-  })
-
   it('validates totp code length', () => {
     expect(totpCodeSchema.safeParse('123456').success).toBe(true)
     expect(totpCodeSchema.safeParse('12345').success).toBe(false)
@@ -53,11 +45,6 @@ describe('validators', () => {
   it('validates password schema', () => {
     expect(passwordSchema.safeParse('weak').success).toBe(false)
     expect(passwordSchema.safeParse('Abc123!').success).toBe(true)
-  })
-
-  it('validates tenant update schema', () => {
-    expect(tenantUpdateSchema.safeParse({ name: 'Acme', isActive: true }).success).toBe(true)
-    expect(tenantUpdateSchema.safeParse({ name: '', isActive: true }).success).toBe(false)
   })
 
   it('validates disable 2FA schema', () => {

@@ -1,40 +1,21 @@
 using JAdmin.Common;
-using JAdmin.Config;
-using JAdmin.Data;
 using JAdmin.Dtos.Auth;
 using JAdmin.Entities;
 using JAdmin.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace JAdmin.Services.Impl;
 
 public class AuthService(
-    AppDbContext db,
     UserManager<ApplicationUser> userManager,
     ITokenService tokenService,
     IRefreshTokenService refreshTokenService,
-    ITwoFactorService twoFactorService,
-    ITenantManagementService tenantManagementService,
-    ITenantContext tenantContext,
-    IOptions<SeedSettings> seedOptions) : IAuthService
+    ITwoFactorService twoFactorService) : IAuthService
 {
-    private readonly SeedSettings _seed = seedOptions.Value;
-
     public async Task<ServiceResult<AuthResponse>> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
     {
-        var tenant = await db.Tenants.FirstOrDefaultAsync(t => t.Slug == request.TenantSlug, cancellationToken);
-        if (tenant is null)
-            return ServiceResult<AuthResponse>.Fail("Invalid credentials", StatusCodes.Status401Unauthorized);
-
-        if (!tenant.IsActive)
-            return ServiceResult<AuthResponse>.Fail("Tenant is inactive", StatusCodes.Status401Unauthorized);
-
-        var user = await userManager.Users
-            .IgnoreQueryFilters()
-            .Include(u => u.Tenant)
-            .FirstOrDefaultAsync(u => u.TenantId == tenant.Id && u.NormalizedEmail == userManager.NormalizeEmail(request.Email), cancellationToken);
+        var user = await userManager.FindByEmailAsync(request.Email);
 
         if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
         {
@@ -62,24 +43,8 @@ public class AuthService(
 
     public async Task<ServiceResult<UserInfoDto>> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
     {
-        var isSuperAdmin = tenantContext.IsSuperAdmin;
-
-        if (!tenantContext.IsAuthenticated)
-            return ServiceResult<UserInfoDto>.Fail("Unauthorized", StatusCodes.Status401Unauthorized);
-
-        var targetTenantId = ResolveTargetTenantId(request, isSuperAdmin);
-        if (targetTenantId is null)
-            return ServiceResult<UserInfoDto>.Fail("Invalid tenant", StatusCodes.Status400BadRequest);
-
-        var tenant = await db.Tenants.FirstOrDefaultAsync(t => t.Id == targetTenantId, cancellationToken);
-        if (tenant is null)
-            return ServiceResult<UserInfoDto>.Fail("Invalid tenant", StatusCodes.Status400BadRequest);
-
-        if (!tenant.IsActive)
-            return ServiceResult<UserInfoDto>.Fail("Tenant is inactive", StatusCodes.Status400BadRequest);
-
         var roles = request.Roles.Count == 0 ? [Roles.User] : request.Roles.Distinct().ToList();
-        var roleValidation = ValidateAssignableRoles(roles, isSuperAdmin, tenant);
+        var roleValidation = ValidateAssignableRoles(roles);
         if (roleValidation is not null)
             return ServiceResult<UserInfoDto>.Fail(roleValidation, roleValidation.Contains("Forbidden") ? StatusCodes.Status403Forbidden : StatusCodes.Status400BadRequest);
 
@@ -87,8 +52,7 @@ public class AuthService(
         {
             UserName = request.Email,
             Email = request.Email,
-            EmailConfirmed = true,
-            TenantId = tenant.Id
+            EmailConfirmed = true
         };
 
         var createResult = await userManager.CreateAsync(user, request.Password);
@@ -118,9 +82,7 @@ public class AuthService(
 
     public async Task<ServiceResult<UserInfoDto>> GetCurrentUserAsync(string userId, CancellationToken cancellationToken = default)
     {
-        var user = await userManager.Users
-            .Include(u => u.Tenant)
-            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var user = await userManager.FindByIdAsync(userId);
 
         if (user is null)
             return ServiceResult<UserInfoDto>.Fail("User not found", StatusCodes.Status404NotFound);
@@ -128,23 +90,10 @@ public class AuthService(
         return ServiceResult<UserInfoDto>.Ok(await MapUserInfoAsync(user, cancellationToken));
     }
 
-    private Guid? ResolveTargetTenantId(RegisterRequest request, bool isSuperAdmin)
+    private static string? ValidateAssignableRoles(List<string> roles)
     {
-        if (isSuperAdmin && request.TenantId.HasValue)
-            return request.TenantId;
-
-        return tenantContext.TenantId;
-    }
-
-    private string? ValidateAssignableRoles(List<string> roles, bool isSuperAdmin, Tenant tenant)
-    {
-        var allowed = isSuperAdmin ? Roles.SuperAdminAssignable : [Roles.User];
-
-        if (roles.Any(r => !allowed.Contains(r)))
+        if (roles.Any(r => !Roles.AdminAssignable.Contains(r)))
             return "Forbidden: cannot assign one or more roles";
-
-        if (roles.Contains(Roles.SuperAdmin) && !tenantManagementService.IsSystemTenant(tenant))
-            return "Forbidden: SuperAdmin role can only be assigned in the system tenant";
 
         return null;
     }
@@ -152,8 +101,8 @@ public class AuthService(
     private async Task<AuthResponse> IssueTokensAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         var roles = (await userManager.GetRolesAsync(user)).ToList();
-        var (token, expiresAt) = tokenService.GenerateAccessToken(user, roles, user.TenantId);
-        var (refreshPlain, refreshExpires) = await refreshTokenService.CreateAsync(user.Id, user.TenantId, cancellationToken);
+        var (token, expiresAt) = tokenService.GenerateAccessToken(user, roles);
+        var (refreshPlain, refreshExpires) = await refreshTokenService.CreateAsync(user.Id, cancellationToken);
 
         return new AuthResponse
         {
@@ -167,16 +116,13 @@ public class AuthService(
 
     private async Task<AuthResponse?> BuildAuthResponseFromUserIdAsync(string userId, CancellationToken cancellationToken)
     {
-        var user = await userManager.Users
-            .IgnoreQueryFilters()
-            .Include(u => u.Tenant)
-            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var user = await userManager.FindByIdAsync(userId);
 
-        if (user is null || !user.Tenant.IsActive)
+        if (user is null)
             return null;
 
         var roles = (await userManager.GetRolesAsync(user)).ToList();
-        var (token, expiresAt) = tokenService.GenerateAccessToken(user, roles, user.TenantId);
+        var (token, expiresAt) = tokenService.GenerateAccessToken(user, roles);
 
         return new AuthResponse
         {
@@ -190,7 +136,6 @@ public class AuthService(
 
     private async Task<UserInfoDto> MapUserInfoAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
-        await db.Entry(user).Reference(u => u.Tenant).LoadAsync(cancellationToken);
         var roles = await userManager.GetRolesAsync(user);
         var twoFactor = await twoFactorService.IsEnabledAsync(user, cancellationToken);
 
@@ -198,8 +143,6 @@ public class AuthService(
         {
             Id = user.Id,
             Email = user.Email ?? string.Empty,
-            TenantId = user.TenantId,
-            TenantName = user.Tenant.Name,
             Roles = roles.ToList(),
             TwoFactorEnabled = twoFactor
         };

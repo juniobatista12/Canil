@@ -6,7 +6,6 @@ function toQuery(params: PaginationQuery): string {
   const search = new URLSearchParams()
   if (params.page) search.set('page', String(params.page))
   if (params.pageSize) search.set('pageSize', String(params.pageSize))
-  if (params.tenantId) search.set('tenantId', params.tenantId)
   const query = search.toString()
   return query ? `?${query}` : ''
 }
@@ -30,8 +29,4 @@ export function removeUserRole(userId: string, roleName: string): Promise<void> 
   return api<void>(`/api/users/${userId}/roles/${encodeURIComponent(roleName)}`, {
     method: 'DELETE',
   })
-}
-
-export function moveUserToSystemTenant(userId: string): Promise<void> {
-  return api<void>(`/api/users/${userId}/move-to-system-tenant`, { method: 'POST' })
 }

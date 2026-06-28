@@ -5,21 +5,17 @@ import type { PagedResult } from '@/types/api'
 import type { UserListItemDto } from '@/types/users'
 
 describe('toUserListItem', () => {
-  it('normalizes missing roles and tenantName', () => {
+  it('normalizes missing roles', () => {
     expect(
       toUserListItem({
         id: 'u1',
         email: 'a@test.com',
-        tenantId: 't1',
-        tenantName: undefined as unknown as string,
         roles: undefined as unknown as string[],
         twoFactorEnabled: false,
       }),
     ).toEqual({
       id: 'u1',
       email: 'a@test.com',
-      tenantId: 't1',
-      tenantName: '',
       roles: [],
       twoFactorEnabled: false,
     })
@@ -32,8 +28,6 @@ describe('upsertUserInCache', () => {
     const user: UserListItemDto = {
       id: 'u-new',
       email: 'new@test.com',
-      tenantId: 't1',
-      tenantName: 'System',
       roles: ['User'],
       twoFactorEnabled: false,
     }
@@ -50,8 +44,6 @@ describe('findUserInCache', () => {
     const user: UserListItemDto = {
       id: 'u1',
       email: 'a@test.com',
-      tenantId: 't1',
-      tenantName: 'Tenant',
       roles: ['User'],
       twoFactorEnabled: false,
     }

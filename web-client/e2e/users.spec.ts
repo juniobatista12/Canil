@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test'
-import { loginAsSuperAdmin } from './helpers/auth'
+import { loginAsAdmin } from './helpers/auth'
 import { clickNavLink } from './helpers/navigation'
 import { guidPath } from './helpers/routes'
 
 test.describe('users', () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsSuperAdmin(page)
+    await loginAsAdmin(page)
     await clickNavLink(page, 'Usuários')
   })
 
@@ -15,11 +15,6 @@ test.describe('users', () => {
     await page.getByRole('link', { name: /registrar usuário/i }).click()
     await expect(page).toHaveURL(/\/users\/register$/)
     await expect(page.getByRole('heading', { name: /registrar usuário/i })).toBeVisible()
-
-    // SuperAdmin: system tenant is pre-selected (tenant name, not raw id).
-    await expect(page.locator('[data-slot="select-value"]').first()).toHaveText('System', {
-      timeout: 15_000,
-    })
 
     const newEmail = `e2e-${Date.now()}@localhost`
     await page.getByLabel('E-mail').fill(newEmail)

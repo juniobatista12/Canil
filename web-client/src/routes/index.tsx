@@ -10,9 +10,6 @@ import { ProfilePage } from '@/pages/profile/ProfilePage'
 import { RegisterUserPage } from '@/pages/users/RegisterUserPage'
 import { UserDetailPage } from '@/pages/users/UserDetailPage'
 import { UsersListPage } from '@/pages/users/UsersListPage'
-import { TenantCreatePage } from '@/pages/tenants/TenantCreatePage'
-import { TenantEditPage } from '@/pages/tenants/TenantEditPage'
-import { TenantsListPage } from '@/pages/tenants/TenantsListPage'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { RoleRoute } from '@/routes/RoleRoute'
 import { ROLES } from '@/types/auth'
@@ -78,7 +75,7 @@ export function AppRoutes() {
           <Route
             path="users"
             element={
-              <RoleRoute roles={[ROLES.Admin, ROLES.SuperAdmin]}>
+              <RoleRoute roles={[ROLES.Admin]}>
                 <UsersListPage />
               </RoleRoute>
             }
@@ -86,7 +83,7 @@ export function AppRoutes() {
           <Route
             path="users/register"
             element={
-              <RoleRoute roles={[ROLES.Admin, ROLES.SuperAdmin]}>
+              <RoleRoute roles={[ROLES.Admin]}>
                 <RegisterUserPage />
               </RoleRoute>
             }
@@ -94,32 +91,8 @@ export function AppRoutes() {
           <Route
             path="users/:id"
             element={
-              <RoleRoute roles={[ROLES.Admin, ROLES.SuperAdmin]}>
+              <RoleRoute roles={[ROLES.Admin]}>
                 <UserDetailPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="tenants"
-            element={
-              <RoleRoute roles={[ROLES.SuperAdmin]}>
-                <TenantsListPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="tenants/new"
-            element={
-              <RoleRoute roles={[ROLES.SuperAdmin]}>
-                <TenantCreatePage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="tenants/:id"
-            element={
-              <RoleRoute roles={[ROLES.SuperAdmin]}>
-                <TenantEditPage />
               </RoleRoute>
             }
           />

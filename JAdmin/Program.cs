@@ -1,6 +1,5 @@
 using JAdmin.Data;
 using JAdmin.Extensions;
-using JAdmin.Multitenancy;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +14,6 @@ app.UseAppSwagger();
 app.UseHttpsRedirection();
 app.UseCors("AppCors");
 app.UseAuthentication();
-app.UseMultitenancy();
 app.UseAuthorization();
 app.MapControllers();
 

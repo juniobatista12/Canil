@@ -1,16 +1,14 @@
 @JAdmin_HostAddress = http://localhost:8080
-@tenantSlug = system
-@superAdminEmail = superadmin@localhost
-@superAdminPassword = SuperAdmin@123!
+@adminEmail = admin@localhost
+@adminPassword = Admin@123!
 
-### Login — SuperAdmin (único usuário do seed)
+### Login — Admin (único usuário do seed)
 POST {{JAdmin_HostAddress}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "{{superAdminEmail}}",
-  "password": "{{superAdminPassword}}",
-  "tenantSlug": "{{tenantSlug}}"
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
 }
 
 ### Refresh
@@ -25,7 +23,7 @@ Content-Type: application/json
 GET {{JAdmin_HostAddress}}/api/auth/me
 Authorization: Bearer {{token}}
 
-### Register user (SuperAdmin token — cria Admin/User conforme roles no body)
+### Register user (Admin token — cria Admin/User conforme roles no body)
 POST {{JAdmin_HostAddress}}/api/auth/register
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -39,20 +37,6 @@ Authorization: Bearer {{token}}
 ### List users
 GET {{JAdmin_HostAddress}}/api/users?page=1&pageSize=20
 Authorization: Bearer {{token}}
-
-### List tenants (SuperAdmin)
-GET {{JAdmin_HostAddress}}/api/tenants
-Authorization: Bearer {{token}}
-
-### Create tenant (SuperAdmin)
-POST {{JAdmin_HostAddress}}/api/tenants
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-  "name": "Acme Corp",
-  "slug": "acme"
-}
 
 ### Logout
 POST {{JAdmin_HostAddress}}/api/auth/logout

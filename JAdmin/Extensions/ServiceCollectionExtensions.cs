@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
             {
                 Title = "JAdmin API",
                 Version = "v1",
-                Description = "API multitenancy com JWT, refresh token e 2FA TOTP"
+                Description = "API com JWT, refresh token e 2FA TOTP"
             });
 
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -118,14 +118,12 @@ public static class ServiceCollectionExtensions
             ?? throw new InvalidOperationException("Redis connection string is required.");
         services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnection));
 
-        services.AddScoped<ITenantContext, TenantContext>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ITwoFactorService, TwoFactorService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserRoleService, UserRoleService>();
-        services.AddScoped<ITenantManagementService, TenantManagementService>();
 
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();

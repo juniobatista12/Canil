@@ -26,9 +26,6 @@ export function DashboardPage() {
           <CardTitle>{t('dashboard.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <p>
-            <span className="font-medium">{t('dashboard.tenant')}:</span> {user.tenantName}
-          </p>
           <div className="flex items-center gap-2">
             <span className="font-medium">{t('dashboard.roles')}:</span>
             <RoleBadges roles={user.roles} />
@@ -46,14 +43,9 @@ export function DashboardPage() {
           <Link to="/profile">
             <Button variant="outline">{t('nav.profile')}</Button>
           </Link>
-          {hasAnyRole([ROLES.Admin, ROLES.SuperAdmin]) && (
+          {hasAnyRole([ROLES.Admin]) && (
             <Link to="/users">
               <Button variant="outline">{t('nav.users')}</Button>
-            </Link>
-          )}
-          {hasAnyRole([ROLES.SuperAdmin]) && (
-            <Link to="/tenants">
-              <Button variant="outline">{t('nav.tenants')}</Button>
             </Link>
           )}
         </div>
